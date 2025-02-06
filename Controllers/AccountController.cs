@@ -1,18 +1,22 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KeycloakPOC.Controllers
 {
     public class AccountController : Controller
     {
-        public IActionResult Login()
+        public IActionResult Login(string returnUrl = "/")
         {
-            return Challenge(new AuthenticationProperties { RedirectUri = "/" }, "oidc");
+            return Challenge(new AuthenticationProperties { RedirectUri = returnUrl }, "oidc");
         }
 
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            return SignOut(new AuthenticationProperties { RedirectUri = "/" }, "Cookies", "oidc");
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync("oidc");
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }

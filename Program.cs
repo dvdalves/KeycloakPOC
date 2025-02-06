@@ -14,12 +14,19 @@ builder.Services.AddAuthentication(options =>
     options.Authority = builder.Configuration["Keycloak:Authority"];
     options.ClientId = builder.Configuration["Keycloak:ClientId"];
     options.ClientSecret = builder.Configuration["Keycloak:ClientSecret"];
-    options.ResponseType = builder.Configuration["Keycloak:ResponseType"];
+    options.ResponseType = builder.Configuration["Keycloak:ResponseType"]!;
+
+    options.CallbackPath = new PathString("/signin-oidc");
+    options.SignedOutCallbackPath = new PathString("/signout-callback-oidc");
+
     options.SaveTokens = true;
     options.RequireHttpsMetadata = builder.Configuration.GetValue<bool>("Keycloak:RequireHttpsMetadata");
+
     options.Scope.Add("openid");
     options.Scope.Add("profile");
     options.Scope.Add("email");
+
+    options.GetClaimsFromUserInfoEndpoint = true;
 });
 
 var app = builder.Build();
